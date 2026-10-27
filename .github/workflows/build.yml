@@ -7,36 +7,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Dezipper le projet
-        run: |
-          unzip -o LecteurPro.zip || unzip -o *.zip
-          echo "--- fichiers ---"
-          ls -la
-          find . -name gradlew
-
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - name: Dezipper
+        run: unzip -o LecteurPro.zip || unzip -o *.zip
+      - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Compiler l'APK
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Compiler
         run: |
-          GRADLEW=$(find . -name gradlew -type f | head -n 1)
-          if [ -z "$GRADLEW" ]; then
-            echo "gradlew introuvable"
-            find . -type f | head -n 100
-            exit 1
-          fi
-          DIR=$(dirname "$GRADLEW")
-          echo "Trouvé dans $DIR"
-          cd "$DIR"
-          chmod +x ./gradlew
-          ./gradlew assembleDebug
-
+          cd LecteurPro
+          gradle assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: LecteurPro-APK
-          path: |
-            **/app/build/outputs/apk/debug/*.apk
+          path: LecteurPro/app/build/outputs/apk/debug/*.apk
