@@ -1,4 +1,4 @@
-name: Build LecteurPro APK
+name: Build LecteurPro APK - FINAL
 on:
   push:
     branches: [ main ]
@@ -9,16 +9,23 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Dezipper
-        run: unzip -o LecteurPro.zip || unzip -o *.zip
+        run: |
+          rm -rf LecteurPro
+          unzip -o LecteurPro.zip
       - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
-      - uses: gradle/actions/setup-gradle@v4
+      - name: Installer SDK Android
+        uses: android-actions/setup-android@v3
+      - name: Installer Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.7
       - name: Compiler
         run: |
           cd LecteurPro
-          gradle assembleDebug
+          gradle assembleDebug --stacktrace
       - uses: actions/upload-artifact@v4
         with:
           name: LecteurPro-APK
